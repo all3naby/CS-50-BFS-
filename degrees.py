@@ -98,7 +98,9 @@ def shortest_path(source, target):
     start = Node(state=source,parent=empty,action=None)
     frontier = QueueFrontier()
     frontier.add(start)
+    neighboursFound = []
     while True:
+
         
         if frontier.empty():
             return None
@@ -111,18 +113,29 @@ def shortest_path(source, target):
                 result.append((node.action,node.state))
                 node = Node(state=node.parent.state,parent=node.parent.parent,action=node.parent.action)
             result.reverse()
+            print("Number of States explored: "+str(numExplored))
             return result 
         
         exploredStates.append(node.state)
 
         neighbours = neighbors_for_person(node.state)
+        if (node != start):
+            parentsNeighbours = neighbors_for_person(node.parent.state)
+            neighboursFound.append(parentsNeighbours)
+        
+        #Optimization
+
+
         for (movie_id,person_id) in neighbours:
+            if (movie_id,person_id) in neighboursFound:
+                break
             if person_id == target:
                 result = [(movie_id,person_id)]
                 while node.parent.state  is  not None:
                     result.append((node.action,node.state))
                     node = Node(state=node.parent.state,parent=node.parent.parent,action=node.parent.action)
                 result.reverse()
+                print("Number of States explored: "+str(numExplored))
                 return result 
             temp_node = Node(state=person_id,parent=node,action=movie_id)
             if (person_id not in exploredStates) and (not frontier.contains_state(temp_node)):
